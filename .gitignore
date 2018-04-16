@@ -1,0 +1,11 @@
+*~
+.nfs*
+*.o
+.dropbox*
+*.eps
+*.top
+*.DS_Store
+*.DSYM*
+*.a
+version.f
+*.mod
