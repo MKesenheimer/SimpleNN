@@ -25,14 +25,14 @@ $(shell mkdir -p build)
 ## Paths
 
 WORKINGDIR = $(shell pwd)
-PARENTDIR  = $(WORKINGDIR)/..
+PARENTDIR  = "$(WORKINGDIR)/.."
 
 ########################################################################
 ## search for the files and set paths
 
-vpath %.c $(WORKINGDIR)
-vpath %.o $(WORKINGDIR)/build
-UINCLUDE = $(WORKINGDIR)
+vpath %.c "$(WORKINGDIR)"
+vpath %.o "$(WORKINGDIR)/build"
+UINCLUDE = "$(WORKINGDIR)"
 
 ########################################################################
 ## Includes
