@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "NN.h"
+#include "SimpleNN.h"
 
 int main() {
     // random numbers
@@ -56,5 +57,8 @@ int main() {
     printf("o1 = %f\n",nn.olayer[0].output);
     printf("o2 = %f\n\n",nn.olayer[1].output);
     
+	printf("Press Any Key to Continue\n");
+	getchar();
+
 	return 0;
 }

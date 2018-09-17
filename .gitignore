@@ -9,3 +9,5 @@
 *.a
 version.f
 *.mod
+*.log
+*.tlog
