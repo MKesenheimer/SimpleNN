@@ -26,8 +26,5 @@
     <ClInclude Include="..\NN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\SimpleNN.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
