@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "NN.h"
-#include "SimpleNN.h"
 
 int main() {
     // random numbers
@@ -31,7 +30,7 @@ int main() {
     dataset[1].yy[1] = 1;
     
     // train the network
-    train(&nn, dataset, 0.001, 15);
+    train1(&nn, dataset, 0.001, 15);
 
     // test the network
     double xx[NINPUTS];
