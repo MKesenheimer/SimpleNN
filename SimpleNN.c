@@ -57,8 +57,10 @@ int main() {
     printf("o1 = %f\n",nn.olayer[0].output);
     printf("o2 = %f\n\n",nn.olayer[1].output);
     
+#ifdef WINDOWS
 	printf("Press Any Key to Continue\n");
 	getchar();
+#endif // WINDOWS
 
 	return 0;
 }

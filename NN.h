@@ -1,5 +1,4 @@
-#ifndef NN_H
-#define NN_H
+#pragma once
 
 #include <stdio.h>
 #include <math.h>
