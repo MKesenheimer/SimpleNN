@@ -61,14 +61,14 @@ USER = SimpleNN.o NN.o
 
 BUILD = $(USER)
 
-SimpleNN: $(BUILD)
+SimpleNN.exe: $(BUILD)
 	  $(CXX) $(patsubst %,build/%,$(BUILD)) $(LDFLAGS) $(LIB) $(FRM) -o $@
 
 clean:
-	rm -f build/*.o SimpleNN
+	rm -f build/*.o SimpleNN.exe
 
 do:
-	make && ./SimpleNN
+	make && ./SimpleNN.exe
 
 ########################################################################
 #                       -*- End of Makefile -*-                        #
