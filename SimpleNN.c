@@ -8,7 +8,7 @@
 
 int main() {
     // random numbers
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
     
     // initialize NN
     struct NN nn;

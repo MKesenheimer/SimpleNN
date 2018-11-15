@@ -12,3 +12,27 @@ version.f
 *.log
 *.tlog
 *.exe
+
+#Thumbnail-Dateien von Windows
+Thumbs.db
+
+#Temporäre/Build-Dateien von Visual Studio
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+.suo
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Dd]ebug*/
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
