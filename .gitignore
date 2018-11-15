@@ -25,7 +25,6 @@ Thumbs.db
 *_p.c
 *.ncb
 *.suo
-.suo
 *.bak
 *.cache
 *.ilk
@@ -36,3 +35,9 @@ Thumbs.db
 obj/
 [Rr]elease*/
 _ReSharper*/
+
+/.vs/SimpleNN/v15/.suo
+/.vs/SimpleNN/v15/Browse.VC.db
+/.vs/SimpleNN/v15/Browse.VC.opendb
+/.vs/SimpleNN/v15/ipch/AutoPCH/46de6e728ce4f784/NN.ipch
+/.vs/SimpleNN/v15/ipch/AutoPCH/4d517d642b0830f9/SIMPLENN.ipch
