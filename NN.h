@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <omp.h>
-
 
 #define NINPUTS 4
 #define NOUTPUTS 2
@@ -19,8 +17,13 @@
 // choose parallelization
 //#define PARALLEL1
 //#define PARALLEL2
-#define PARALLEL3
+//#define PARALLEL3
 #define NTHREADS 4
+
+#if defined(PARALLEL1) || defined(PARALLEL2) || defined(PARALLEL3)
+#include <omp.h>
+#endif
+
 
 // choose transfer function
 #define SIGMOID
