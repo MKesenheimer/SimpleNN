@@ -110,16 +110,14 @@ void initNN(struct NN *nn) {
     }
 }
 
-void calculateNN(const double xx[], struct NN *nnn) {
-    struct NN nn = *nnn;
-
+void calculateNN(const double xx[], struct NN *nn) {
     #ifdef PARALLEL1
         #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(xx) shared(nn)
     #endif
     for(int i = 0; i < NINPUTS; ++i) {
-        double temp = nn.ilayer[i].weight*xx[i];
+        double temp = nn->ilayer[i].weight * xx[i];
         for(int n = 0; n < NNEURONS; n++) {
-            nn.ilayer[i].output[n] = transferFunction(temp, nn.ilayer[i].theta);
+            nn->ilayer[i].output[n] = transferFunction(temp, nn->ilayer[i].theta);
         }
     }
 
@@ -128,11 +126,11 @@ void calculateNN(const double xx[], struct NN *nnn) {
     #endif
     for(int i = 0; i < NNEURONS; ++i) {
         double temp = 0;
-        for(int n = 0; n<NINPUTS; n++) {
-            temp += nn.neuron[i].weight[n]*nn.ilayer[n].output[i];
+        for(int n = 0; n < NINPUTS; n++) {
+            temp += nn->neuron[i].weight[n] * nn->ilayer[n].output[i];
         }
         for(int n = 0; n < NOUTPUTS; n++) {
-            nn.neuron[i].output[n] = transferFunction(temp, nn.neuron[i].theta);
+            nn->neuron[i].output[n] = transferFunction(temp, nn->neuron[i].theta);
         }
     }
 
@@ -142,26 +140,22 @@ void calculateNN(const double xx[], struct NN *nnn) {
     for(int i = 0; i < NOUTPUTS; ++i) {
         double temp = 0;
         for(int n = 0; n < NNEURONS; n++) {
-            temp += nn.olayer[i].weight[n]*nn.neuron[n].output[i];
+            temp += nn->olayer[i].weight[n] * nn->neuron[n].output[i];
         }
-        nn.olayer[i].output = transferFunction(temp, nn.olayer[i].theta);
+        nn->olayer[i].output = transferFunction(temp, nn->olayer[i].theta);
     }
-
-    *nnn = nn;
 }
 
-double lossFunction(struct NN *nnn, const struct DataSet dataset[]) {
+double lossFunction(struct NN *nn, const struct DataSet dataset[]) {
     double delta = 0;
-    struct NN nn = *nnn;
-
     #ifdef PARALLEL2
-        #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(dataset,nn) reduction(+:delta)
+        #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(dataset, nn) reduction(+:delta)
     #endif
-    for(int i = 0; i<NDATASETS; ++i) {
-        calculateNN(dataset[i].xx, &nn);
+    for(int i = 0; i < NDATASETS; ++i) {
+        calculateNN(dataset[i].xx, nn);
         double delta2 = 0;
-        for(int j=0; j<NOUTPUTS; ++j) {
-            delta2 += pow(nn.olayer[j].output - dataset[i].yy[j],2);
+        for(int j = 0; j < NOUTPUTS; ++j) {
+            delta2 += pow(nn->olayer[j].output - dataset[i].yy[j], 2);
         }
         delta += sqrt(delta2);
     }
@@ -188,12 +182,12 @@ double linesearch(const double par[], const double deriv[], const struct DataSet
     double min = point[0];
     int imin = 0;
     for (int n = 0; n < npoints; n++) {
-        if(min>point[n]) {
+        if(min > point[n]) {
             min = point[n];
             imin = n;
         }
     }
-    alpha = (double)learningrate*(imin+1)/npoints;
+    alpha = (double)learningrate * (imin + 1) / npoints;
     return alpha;
 }
 
@@ -263,63 +257,58 @@ void train1(struct NN *nn, const struct DataSet dataset[], const double accuracy
 
 // train the network (quasi newtonian method)
 void train2(struct NN *nn, const struct DataSet dataset[], const double accuracy, const double learningrate) {
-    bool optimized = false;
     double h = 0.005;
 
     // optimize the cost function
-    while (!optimized) {
-        if(lossFunction(nn, dataset) < accuracy) {
-            optimized = true;
-        } else {
-            struct NN nnhi, nnhj, nnhij;
+    while (!(lossFunction(nn, dataset) < accuracy)) {
+        struct NN nnhi, nnhj, nnhij;
 
-            // first derivatives
-            double deriv[NPARAMETERS];
-            // second derivatives
-            double hess[NPARAMETERS][NPARAMETERS];
+        // first derivatives
+        double deriv[NPARAMETERS];
+        // second derivatives
+        double hess[NPARAMETERS][NPARAMETERS];
 
-            double par[NPARAMETERS], tempi, tempj;
-            structToArray(nn, par);
+        double par[NPARAMETERS], tempi, tempj;
+        structToArray(nn, par);
 
-            // calculate the derivatives
-            #ifdef PARALLEL3
-                #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(h, nn, dataset) shared(deriv, hess, par) private(tempi, tempj, nnhi, nnhj, nnhij)
-            #endif
-            for(int i = 0; i < NPARAMETERS; ++i) {
+        // calculate the derivatives
+        #ifdef PARALLEL3
+            #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(h, nn, dataset) shared(deriv, hess, par) private(tempi, tempj, nnhi, nnhj, nnhij)
+        #endif
+        for(int i = 0; i < NPARAMETERS; ++i) {
+            tempi = par[i];
+            par[i] = par[i] + h;
+            arrayToStruct(par, &nnhi);
+            deriv[i] = (lossFunction(&nnhi, dataset) - lossFunction(nn, dataset)) / h;
+            par[i] = tempi;
+
+            for(int j=i; j<NPARAMETERS; ++j) {
+                tempj = par[j];
+                par[j] = par[j] + h;
+                arrayToStruct(par, &nnhj);
+                par[j] = tempj;
+
                 tempi = par[i];
                 par[i] = par[i] + h;
-                arrayToStruct(par, &nnhi);
-                deriv[i] = (lossFunction(&nnhi, dataset) - lossFunction(nn, dataset)) / h;
+                tempj = par[j];
+                par[j] = par[j] + h;
+                arrayToStruct(par, &nnhij);
                 par[i] = tempi;
+                par[j] = tempj;
 
-                for(int j=i; j<NPARAMETERS; ++j) {
-                    tempj = par[j];
-                    par[j] = par[j] + h;
-                    arrayToStruct(par, &nnhj);
-                    par[j] = tempj;
-
-                    tempi = par[i];
-                    par[i] = par[i] + h;
-                    tempj = par[j];
-                    par[j] = par[j] + h;
-                    arrayToStruct(par, &nnhij);
-                    par[i] = tempi;
-                    par[j] = tempj;
-
-                    hess[i][j] = (lossFunction(&nnhij, dataset) - lossFunction(&nnhi, dataset) - lossFunction(&nnhj, dataset) + lossFunction(nn, dataset)) / pow(h, 2.0);
-                    hess[j][i] = hess[i][j];
-                }
+                hess[i][j] = (lossFunction(&nnhij, dataset) - lossFunction(&nnhi, dataset) - lossFunction(&nnhj, dataset) + lossFunction(nn, dataset)) / pow(h, 2.0);
+                hess[j][i] = hess[i][j];
             }
-
-            #ifdef PARALLEL3
-                #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(deriv,learningrate) shared(par)
-            #endif
-            for(int i = 0; i < NPARAMETERS; ++i) {
-                par[i] = par[i] - learningrate * deriv[i];
-            }
-
-            arrayToStruct(par, nn);
         }
+
+        #ifdef PARALLEL3
+            #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(deriv,learningrate) shared(par)
+        #endif
+        for(int i = 0; i < NPARAMETERS; ++i) {
+            par[i] = par[i] - learningrate * deriv[i];
+        }
+
+        arrayToStruct(par, nn);
     }
 }
 
