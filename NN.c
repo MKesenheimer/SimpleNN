@@ -53,26 +53,26 @@ double transferFunction(double x, double theta) {
     double f;
 
     #ifdef SIGMOID
-        f = 1/(1+exp(theta-x));
+        f = 1 / (1 + exp(theta - x));
     #endif
 
     #ifdef RELU
         if(x+theta >= 0) {
-            f = x+theta;
+            f = x + theta;
         } else {
             f = 0;
         }
     #endif
 
     #ifdef TANH
-        f= tanh(theta+x);
+        f= tanh(theta + x);
     #endif
 
     return f;
 }
 
 void initNN(struct NN *nn) {
-    save = 0.;
+    save = 0;
     nadapt = 0;
 
     // initialize input layer
@@ -198,7 +198,7 @@ void train1(struct NN *nn, const struct DataSet dataset[], const double accuracy
 
     // optimize the cost function
     while (!optimized) {
-        double lf = lossFunction(nn, dataset);
+        double lf = lossFunction(nn, dataset); // TODO: diese Abfrage gleich in die while-schleife
         if(lf < accuracy) {
             optimized = true;
         } else {
@@ -212,7 +212,7 @@ void train1(struct NN *nn, const struct DataSet dataset[], const double accuracy
 
             // calculate the derivatives
             #ifdef PARALLEL3
-                #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(h,dataset,par,lf) shared(deriv) private(tempi,nnhi)
+                #pragma omp parallel for num_threads(NTHREADS) default(none) firstprivate(h, dataset, par, lf) shared(deriv) private(tempi, nnhi)
             #endif
             for(int i = 0; i < NPARAMETERS; ++i) {
                 tempi = par[i];
@@ -282,7 +282,7 @@ void train2(struct NN *nn, const struct DataSet dataset[], const double accuracy
             deriv[i] = (lossFunction(&nnhi, dataset) - lossFunction(nn, dataset)) / h;
             par[i] = tempi;
 
-            for(int j=i; j<NPARAMETERS; ++j) {
+            for(int j = i; j < NPARAMETERS; ++j) {
                 tempj = par[j];
                 par[j] = par[j] + h;
                 arrayToStruct(par, &nnhj);
