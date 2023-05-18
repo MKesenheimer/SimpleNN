@@ -14,14 +14,14 @@ void structToArray(const struct NN *nn, double par[]) {
 
     for(int i = 0; i < NNEURONS; ++i) {
         par[counter++] = nn->neuron[i].theta;
-        for(int n = 0; n<NINPUTS; n++) {
+        for(int n = 0; n<NINPUTS; ++n) {
             par[counter++] = nn->neuron[i].weight[n];
         }
     }
 
     for(int i = 0; i < NOUTPUTS; ++i) {
         par[counter++] = nn->olayer[i].theta;
-        for(int n = 0; n < NNEURONS; n++) {
+        for(int n = 0; n < NNEURONS; ++n) {
             par[counter++] = nn->olayer[i].weight[n];
         }
     }
@@ -36,14 +36,14 @@ void arrayToStruct(const double par[], struct NN *nn) {
 
     for(int i = 0; i < NNEURONS; ++i) {
         nn->neuron[i].theta = par[counter++];
-        for(int n = 0; n<NINPUTS; n++) {
+        for(int n = 0; n<NINPUTS; ++n) {
             nn->neuron[i].weight[n] = par[counter++];
         }
     }
 
     for(int i = 0; i < NOUTPUTS; ++i) {
         nn->olayer[i].theta = par[counter++];
-        for(int n = 0; n < NNEURONS; n++) {
+        for(int n = 0; n < NNEURONS; ++n) {
             nn->olayer[i].weight[n] = par[counter++];
         }
     }
@@ -81,7 +81,7 @@ void initNN(struct NN *nn) {
         // the first layer has by default only one input per node
         nn->ilayer[i].weight = 0;
         nn->ilayer[i].input  = 0;
-        for(int n = 0; n < NNEURONS; n++) {
+        for(int n = 0; n < NNEURONS; ++n) {
             nn->ilayer[i].output[n] = 0;
         }
     }
@@ -89,11 +89,11 @@ void initNN(struct NN *nn) {
     // initialize neurons
     for(int i = 0; i < NNEURONS; ++i) {
         nn->neuron[i].theta = 0;
-        for(int n = 0; n<NINPUTS; n++) {
+        for(int n = 0; n<NINPUTS; ++n) {
             nn->neuron[i].weight[n] = 0;
             nn->neuron[i].input[n]  = 0;
         }
-        for(int n = 0; n < NOUTPUTS; n++) {
+        for(int n = 0; n < NOUTPUTS; ++n) {
             nn->neuron[i].output[n] = 0;
         }
     }
@@ -101,7 +101,7 @@ void initNN(struct NN *nn) {
     // initialize output layer
     for(int i = 0; i < NOUTPUTS; ++i) {
         nn->olayer[i].theta = 0;
-        for(int n = 0; n < NNEURONS; n++) {
+        for(int n = 0; n < NNEURONS; ++n) {
             nn->olayer[i].weight[n] = 0;
             nn->olayer[i].input[n]  = 0;
         }
@@ -116,7 +116,7 @@ void calculateNN(const double xx[], struct NN *nn) {
     #endif
     for(int i = 0; i < NINPUTS; ++i) {
         double temp = nn->ilayer[i].weight * xx[i];
-        for(int n = 0; n < NNEURONS; n++) {
+        for(int n = 0; n < NNEURONS; ++n) {
             nn->ilayer[i].output[n] = transferFunction(temp, nn->ilayer[i].theta);
         }
     }
@@ -126,10 +126,10 @@ void calculateNN(const double xx[], struct NN *nn) {
     #endif
     for(int i = 0; i < NNEURONS; ++i) {
         double temp = 0;
-        for(int n = 0; n < NINPUTS; n++) {
+        for(int n = 0; n < NINPUTS; ++n) {
             temp += nn->neuron[i].weight[n] * nn->ilayer[n].output[i];
         }
-        for(int n = 0; n < NOUTPUTS; n++) {
+        for(int n = 0; n < NOUTPUTS; ++n) {
             nn->neuron[i].output[n] = transferFunction(temp, nn->neuron[i].theta);
         }
     }
@@ -139,7 +139,7 @@ void calculateNN(const double xx[], struct NN *nn) {
     #endif
     for(int i = 0; i < NOUTPUTS; ++i) {
         double temp = 0;
-        for(int n = 0; n < NNEURONS; n++) {
+        for(int n = 0; n < NNEURONS; ++n) {
             temp += nn->olayer[i].weight[n] * nn->neuron[n].output[i];
         }
         nn->olayer[i].output = transferFunction(temp, nn->olayer[i].theta);
@@ -170,7 +170,7 @@ double linesearch(const double par[], const double deriv[], const struct DataSet
     #ifdef PARALLEL3
         #pragma omp parallel for num_threads(NTHREADS) default(none) private(nn) firstprivate(deriv,learningrate,par,alpha,dataset) shared(parl,point)
     #endif
-    for (int n = 0; n < npoints; n++) {
+    for (int n = 0; n < npoints; ++n) {
         for(int i = 0; i < NPARAMETERS; ++i) {
             alpha = (double)learningrate * (n + 1) / npoints;
             parl[i] = par[i] - alpha * deriv[i];
@@ -181,7 +181,7 @@ double linesearch(const double par[], const double deriv[], const struct DataSet
     // find minimum
     double min = point[0];
     int imin = 0;
-    for (int n = 0; n < npoints; n++) {
+    for (int n = 0; n < npoints; ++n) {
         if(min > point[n]) {
             min = point[n];
             imin = n;
@@ -325,20 +325,20 @@ void snapshot(struct NN *nn) {
     for(int i = 0; i < NINPUTS; ++i) {
         fprintf(f1, "t%i %f\n", i, nn->ilayer[i].theta);
     }
-    for (int n = 0; n < NNEURONS; n++) {
+    for (int n = 0; n < NNEURONS; ++n) {
         for(int i = 0; i < NINPUTS; ++i) {
             fprintf(f1, "w%i%i %f\n", n, i, nn->neuron[n].weight[i]);
         }
     }
-    for (int n = 0; n < NNEURONS; n++) {
+    for (int n = 0; n < NNEURONS; ++n) {
         fprintf(f1, "t%i %f\n",n, nn->neuron[n].theta);
     }
-    for (int n = 0; n < NOUTPUTS; n++) {
+    for (int n = 0; n < NOUTPUTS; ++n) {
         for(int i = 0; i < NNEURONS; ++i) {
             fprintf(f1, "w%i%i %f\n",n,i,nn->olayer[n].weight[i]);
         }
     }
-    for (int n = 0; n < NOUTPUTS; n++) {
+    for (int n = 0; n < NOUTPUTS; ++n) {
         fprintf(f1, "t%i %f\n",n,nn->olayer[n].theta);
     }
     fclose(f1);
@@ -375,7 +375,7 @@ void load(struct NN *nn) {
             nn->ilayer[i].theta = val;
         }
     }
-    for (int n = 0; n < NNEURONS; n++) {
+    for (int n = 0; n < NNEURONS; ++n) {
         for(int i = 0; i < NINPUTS; ++i) {
             fscanf(f1, "%s", buff);
             strncpy(key1, buff, 255);
@@ -387,7 +387,7 @@ void load(struct NN *nn) {
             }
         }
     }
-    for (int n = 0; n < NNEURONS; n++) {
+    for (int n = 0; n < NNEURONS; ++n) {
         fscanf(f1, "%s", buff);
         strncpy(key1, buff, 255);
         fscanf(f1, "%s", buff);
@@ -397,7 +397,7 @@ void load(struct NN *nn) {
             nn->neuron[n].theta = val;
         }
     }
-    for (int n = 0; n < NOUTPUTS; n++) {
+    for (int n = 0; n < NOUTPUTS; ++n) {
         for(int i = 0; i < NNEURONS; ++i) {
             fscanf(f1, "%s", buff);
             strncpy(key1, buff, 255);
@@ -409,7 +409,7 @@ void load(struct NN *nn) {
             }
         }
     }
-    for (int n = 0; n < NOUTPUTS; n++) {
+    for (int n = 0; n < NOUTPUTS; ++n) {
         fscanf(f1, "%s", buff);
         strncpy(key1, buff, 255);
         fscanf(f1, "%s", buff);

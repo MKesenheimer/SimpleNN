@@ -9,9 +9,9 @@
 #include <string.h>
 
 #define NINPUTS 4
-#define NOUTPUTS 2
-#define NNEURONS 4
-#define NDATASETS 2
+#define NOUTPUTS 3
+#define NNEURONS 40
+#define NDATASETS 4
 #define NPARAMETERS (2*NINPUTS + NINPUTS * NNEURONS + NNEURONS + NNEURONS * NOUTPUTS + NOUTPUTS)
 
 // choose parallelization
