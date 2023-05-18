@@ -47,24 +47,24 @@ double save;
 int nadapt;
 
 struct ILayer {
-    double input;
-    double weight;
-    double output[NNEURONS];
-    double theta;
+    double input;            // mat[NINPUTS]
+    double weight;           // mat[NINPUTS]
+    double output[NNEURONS]; // mat[NINPUTS][NNEURONS]
+    double theta;            // mat[NINPUTS]
 };
 
 struct Neuron {
-    double input[NINPUTS];
-    double weight[NINPUTS];
-    double output[NOUTPUTS];
-    double theta;
+    double input[NINPUTS];   // mat[NNEURONS][NINPUTS]
+    double weight[NINPUTS];  // mat[NNEURONS][NINPUTS]
+    double output[NOUTPUTS]; // mat[NNEURONS][NOUTPUTS]
+    double theta;            // mat[NNEURONS]
 };
 
 struct OLayer {
-    double input[NNEURONS];
-    double weight[NNEURONS];
-    double output;
-    double theta;
+    double input[NNEURONS];  // mat[NOUTPUTS][NNEURONS]
+    double weight[NNEURONS]; // mat[NOUTPUTS][NNEURONS]
+    double output;           // mat[NOUTPUTS]
+    double theta;            // mat[NOUTPUTS]
 };
 
 struct NN {
